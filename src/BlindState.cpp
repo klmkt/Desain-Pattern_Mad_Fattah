@@ -68,7 +68,7 @@ PendingCommand BossBlindState::createSkipRewardCommand() const {
     return PendingCommand{
         CommandTiming::NextAnte,
         false,
-        std::make_unique<BonusHandCommand>()
+        std::make_unique<ExtraRerollCommand>()
     };
 }
 
