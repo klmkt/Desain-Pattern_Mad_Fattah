@@ -24,3 +24,17 @@ public:
     std::string getDescription() const override;
     void execute(RunSessionState& state) override;
 };
+
+class ExtraRerollCommand : public RewardCommand {
+public:
+    std::string getName() const override;
+    std::string getDescription() const override;
+    void execute(RunSessionState& state) override;
+};
+
+class BonusMoneyCommand : public RewardCommand {
+public:
+    std::string getName() const override;
+    std::string getDescription() const override;
+    void execute(RunSessionState& state) override;
+};
