@@ -11,6 +11,7 @@ public:
     virtual int getRewardMoney() const = 0;
     virtual PendingCommand createSkipRewardCommand() const = 0;
     virtual std::unique_ptr<BlindState> nextState(int& ante) const = 0;
+    virtual CommandTiming getCommandTiming() const = 0;
 };
 
 class SmallBlindState : public BlindState {
@@ -20,6 +21,7 @@ public:
     int getRewardMoney() const override;
     PendingCommand createSkipRewardCommand() const override;
     std::unique_ptr<BlindState> nextState(int& ante) const override;
+    CommandTiming getCommandTiming() const override;
 };
 
 class BigBlindState : public BlindState {
@@ -29,6 +31,7 @@ public:
     int getRewardMoney() const override;
     PendingCommand createSkipRewardCommand() const override;
     std::unique_ptr<BlindState> nextState(int& ante) const override;
+    CommandTiming getCommandTiming() const override;
 };
 
 class BossBlindState : public BlindState {
@@ -38,4 +41,5 @@ public:
     int getRewardMoney() const override;
     PendingCommand createSkipRewardCommand() const override;
     std::unique_ptr<BlindState> nextState(int& ante) const override;
+    CommandTiming getCommandTiming() const override;
 };
