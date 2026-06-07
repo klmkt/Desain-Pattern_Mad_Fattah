@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-class RunSessionState;
+struct RunSessionState; // Forward declaration
 
 class RewardCommand {
 public:
@@ -18,21 +18,7 @@ public:
     void execute(RunSessionState& state) override;
 };
 
-class FreePlayingCard : public RewardCommand {
-public:
-    std::string getName() const override;
-    std::string getDescription() const override;
-    void execute(RunSessionState& state) override;
-};
-
-class ExtraRerollCommand : public RewardCommand {
-public:
-    std::string getName() const override;
-    std::string getDescription() const override;
-    void execute(RunSessionState& state) override;
-};
-
-class BonusMoneyCommand : public RewardCommand {
+class FreePlayingCardCommand : public RewardCommand {
 public:
     std::string getName() const override;
     std::string getDescription() const override;

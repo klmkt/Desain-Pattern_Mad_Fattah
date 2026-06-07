@@ -1,52 +1,39 @@
 #include "RewardCommand.h"
 #include "RunSessionState.h"
+#include <iostream>
 
+// ==========================================
+// Implementasi BonusHandCommand
+// ==========================================
 std::string BonusHandCommand::getName() const {
     return "Bonus Hand";
 }
 
 std::string BonusHandCommand::getDescription() const {
-    return "Gain +1 hand next blind.";
+    return "Gain +1 hand play for the next blind";
 }
 
 void BonusHandCommand::execute(RunSessionState& state) {
     state.remainingPlays += 1;
+    std::cout << "  [Command Effect] Gained +1 hand play for the next blind! Total plays: " 
+              << state.remainingPlays << "\n";
 }
 
-std::string FreePlayingCard::getName() const {
+// ==========================================
+// Implementasi FreePlayingCardCommand
+// ==========================================
+std::string FreePlayingCardCommand::getName() const {
     return "Free Playing Card";
 }
 
-std::string FreePlayingCard::getDescription() const {
-    return "Gain 1 free playing card added to the deck.";
+std::string FreePlayingCardCommand::getDescription() const {
+    return "Gain a free playing card, added permanently to the deck";
 }
 
-void FreePlayingCard::execute(RunSessionState& state) {
-    state.freePlayingCards += 1;
-}
-
-std::string ExtraRerollCommand::getName() const {
-    return "Extra Reroll";
-}
-
-std::string ExtraRerollCommand::getDescription() const {
-    return "Gain +1 reroll for the next blind.";
-}
-
-void ExtraRerollCommand::execute(RunSessionState& state) {
-    state.freeRerolls += 1;
-}
-
-std::string BonusMoneyCommand::getName() const {
-    return "Bonus Money";
-}
-
-std::string BonusMoneyCommand::getDescription() const {
-    return "Gain +2 money multiplier.";
-}
-
-void BonusMoneyCommand::execute(RunSessionState& state) {
-    // This could be extended to add a money multiplier field
-    // For now, we'll use it as a placeholder for future enhancement
-    (void)state;
+void FreePlayingCardCommand::execute(RunSessionState& state) {
+    state.deck.addCard("Ace of Spades (Bonus)"); 
+    state.freePlayingCards++;
+    
+    std::cout << "  [Command Effect] Added a free playing card to the deck! Current deck size: " 
+              << state.deck.getRemainingSize() << "\n";
 }
