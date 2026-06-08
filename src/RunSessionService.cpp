@@ -6,6 +6,11 @@ void RunSessionService::skipBlind(RunSessionState& state) {
         return;
     }
 
+    if (!state.currentBlind->canSkip()) {
+        std::cout << "  [Skip not allowed] Boss Blind harus dimainkan.\n";
+        return;
+    }
+
     PendingCommand command = state.currentBlind->createSkipRewardCommand();
     std::cout << "  [Reward Command Created] " << command.command->getName() << ": "
               << command.command->getDescription() << "\n";

@@ -34,6 +34,10 @@ std::string SmallBlindState::getName() const {
     return "Small Blind";
 }
 
+bool SmallBlindState::canSkip() const {
+    return true;
+}
+
 // =====================================
 // BigBlindState
 // =====================================
@@ -63,6 +67,12 @@ CommandTiming BigBlindState::getCommandTiming() const {
 
 std::string BigBlindState::getName() const {
     return "Big Blind";
+}
+bool BossBlindState::canSkip() const {
+    return false;
+}
+bool BigBlindState::canSkip() const {
+    return true;
 }
 
 // =====================================

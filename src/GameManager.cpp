@@ -17,10 +17,14 @@ enum class PlayerAction {
     Skip
 };
 
-PlayerAction promptPlayerAction(const BlindState& blind) {
+PlayerAction promptPlayerAction(const BlindState& blind, bool allowSkip) {
     while (true) {
         std::cout << "Current blind: " << blind.getName() << "\n";
-        std::cout << "Choose action [P]LAY or [S]KIP: ";
+        std::cout << "Choose action [P]LAY";
+        if (allowSkip) {
+            std::cout << " or [S]KIP";
+        }
+        std::cout << ": ";
 
         std::string input;
         if (!(std::cin >> input)) {
@@ -31,11 +35,20 @@ PlayerAction promptPlayerAction(const BlindState& blind) {
             return PlayerAction::Play;
         }
 
-        if (input == "S" || input == "s" || input == "SKIP" || input == "skip") {
+        if (allowSkip && (input == "S" || input == "s" || input == "SKIP" || input == "skip")) {
             return PlayerAction::Skip;
         }
 
-        std::cout << "Invalid choice. Please enter PLAY or SKIP.\n";
+        if (!allowSkip && (input == "S" || input == "s" || input == "SKIP" || input == "skip")) {
+            std::cout << "Boss Blind tidak bisa di-skip. Anda harus PLAY.\n";
+            continue;
+        }
+
+        std::cout << "Invalid choice. Please enter PLAY";
+        if (allowSkip) {
+            std::cout << " or SKIP";
+        }
+        std::cout << ".\n";
     }
 }
 
@@ -94,7 +107,10 @@ void GameManager::runSession() {
             sessionState.currentBlind->getCommandTiming()
         );
 
-        const PlayerAction action = promptPlayerAction(*sessionState.currentBlind);
+        const PlayerAction action = promptPlayerAction(
+            *sessionState.currentBlind,
+            sessionState.currentBlind->canSkip()
+        );
 
         if (action == PlayerAction::Skip) {
             runSessionService->skipBlind(sessionState);

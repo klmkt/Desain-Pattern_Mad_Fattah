@@ -25,7 +25,6 @@ diperluas tanpa merombak keseluruhan kode.
 | ScoringRule        | Calculates base scores                    |
 | JokerManager       | Applies joker effects                     |
 | ScoreContext       | Stores mutable score data                 |
-|--------------------|-------------------------------------------|
 
 ## Runtime Flow
 
