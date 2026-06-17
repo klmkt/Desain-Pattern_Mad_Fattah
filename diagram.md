@@ -62,6 +62,94 @@ flowchart TD
     Y --> Z
 ```
 
+## Sequence Diagram (Detail Fungsi ke Fungsi)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Main as main()
+    participant GM as GameManager
+    participant State as BlindState
+    participant RSS as RunSessionService
+    participant Deck as Deck
+    participant SR as ScoringRule
+    participant JM as JokerManager
+    participant DS as DiscardService
+    participant PC as PendingCommand
+    participant CMD as RewardCommand
+
+    Main->>GM: runSession()
+    GM->>State: init SmallBlindState jika kosong
+    GM->>Deck: initializeStandardDeck()
+    GM->>Deck: shuffleDeck()
+    GM->>GM: setupJokers()
+    GM->>JM: addJoker(FlatChipJoker)
+    GM->>JM: addJoker(PairJoker)
+
+    loop setiap blind
+        GM->>RSS: executePendingCommands(state, currentBlind->getCommandTiming())
+        RSS->>PC: iterasi pendingCommands
+        PC-->>RSS: execute(command) jika timing cocok
+
+        GM->>GM: promptPlayerAction(currentBlind, canSkip)
+        alt player pilih SKIP
+            GM->>RSS: skipBlind(state)
+            RSS->>State: canSkip()
+            RSS->>State: createSkipRewardCommand()
+            RSS->>PC: push PendingCommand
+            RSS->>State: nextState(ante)
+        else player pilih PLAY
+            GM->>Deck: drawCards(8)
+            GM->>State: getTargetScore(ante)
+            loop tiap giliran
+                alt discard
+                    GM->>DS: executeDiscard(state, currentHand, indices)
+                else play cards
+                    GM->>GM: build playedHand
+                    GM->>SR: scoreHand(playedHand)
+                    SR->>SR: chain checker panggil poker hand
+                    GM->>JM: applyAllEffects(context)
+                    JM->>JM: foreach Joker.applyEffect(context)
+                    GM->>GM: update currentScore
+                end
+            end
+            alt target tercapai
+                GM->>State: getRewardMoney()
+                GM->>State: nextState(ante)
+            else gagal
+                GM-->>Main: Game Over
+            end
+        end
+    end
+```
+
+## Komponen dan Interaksi Kelas
+
+```mermaid
+flowchart LR
+    GM[GameManager]
+    RSS[RunSessionService]
+    DS[DiscardService]
+    SR[ScoringRule]
+    JM[JokerManager]
+    Deck[Deck]
+    State[BlindState]
+    PC[PendingCommand]
+    CMD[RewardCommand]
+    Joker[Joker]
+
+    GM -->|memakai| Deck
+    GM -->|memakai| JM
+    GM -->|memakai| RSS
+    GM -->|memakai| DS
+    GM -->|memakai| SR
+    GM -->|memiliki| State
+    RSS -->|menghasilkan| PC
+    PC -->|berisi| CMD
+    JM -->|menyimpan| Joker
+    State -->|membuat| CMD
+```
+
 > Jika diagram Mermaid tidak tampil di preview MDX, gunakan preview Markdown bawaan VS Code atau instal ekstensi yang mendukung Mermaid seperti `Markdown Preview Enhanced`.
 
 ## Fallback Diagram Teks

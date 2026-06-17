@@ -3,12 +3,14 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <sstream>
 #include "GameManager.h"
 
 // Sertakan file Joker dan Context (Pastikan file ini sudah kamu buat sebelumnya)
 #include "FlatChipJoker.h"
 #include "PairJoker.h"
 #include "ScoreContext.h"
+#include "HandRank.h"
 
 namespace {
 
@@ -16,6 +18,54 @@ enum class PlayerAction {
     Play,
     Skip
 };
+
+int parseRank(const std::string& rankStr) {
+    if (rankStr == "Jack") return 11;
+    if (rankStr == "Queen") return 12;
+    if (rankStr == "King") return 13;
+    if (rankStr == "Ace") return 14;
+    try {
+        return std::stoi(rankStr);
+    } catch (...) {
+        return 0;
+    }
+}
+
+char parseSuit(const std::string& suitStr) {
+    if (suitStr == "Hearts") return 'H';
+    if (suitStr == "Diamonds") return 'D';
+    if (suitStr == "Clubs") return 'C';
+    if (suitStr == "Spades") return 'S';
+    return ' ';
+}
+
+Card parseCardString(const std::string& cardStr) {
+    std::istringstream stream(cardStr);
+    std::string rankPart;
+    std::string ofWord;
+    std::string suitPart;
+    stream >> rankPart >> ofWord >> suitPart;
+    return Card{parseRank(rankPart), parseSuit(suitPart)};
+}
+
+std::string handRankToString(HandRank rank) {
+    switch (rank) {
+        case HandRank::HIGH_CARD: return "HighCard";
+        case HandRank::PAIR: return "Pair";
+        case HandRank::TWO_PAIR: return "TwoPair";
+        case HandRank::THREE_OF_A_KIND: return "ThreeOfAKind";
+        case HandRank::STRAIGHT: return "Straight";
+        case HandRank::FLUSH: return "Flush";
+        case HandRank::FULL_HOUSE: return "FullHouse";
+        case HandRank::FOUR_OF_A_KIND: return "FourOfAKind";
+        case HandRank::STRAIGHT_FLUSH: return "StraightFlush";
+        case HandRank::ROYAL_FLUSH: return "RoyalFlush";
+        case HandRank::FIVE_OF_A_KIND: return "FiveOfAKind";
+        case HandRank::FLUSH_HOUSE: return "FlushHouse";
+        case HandRank::FLUSH_FIVE: return "FlushFive";
+        default: return "Unknown";
+    }
+}
 
 PlayerAction promptPlayerAction(const BlindState& blind, bool allowSkip) {
     while (true) {
@@ -155,11 +205,15 @@ void GameManager::runSession() {
                 discardService->executeDiscard(sessionState, currentHandStr, indices);
             } 
             else if (subAction == "P" || subAction == "p") {
-                std::cout << "Enter card numbers to PLAY (separated by space, end with 0, e.g., '1 2 3 4 5 0'): ";
+                std::cout << "Enter card numbers to PLAY (at least 1 card, separated by space, end with 0, e.g., '1 2 3 0'): ";
                 std::vector<int> indices;
                 int idx;
                 while (std::cin >> idx && idx != 0) {
                     indices.push_back(idx - 1);
+                }
+                if (indices.empty()) {
+                    std::cout << "Please select at least one card to play.\n";
+                    continue;
                 }
                 
                 std::vector<std::string> chosenCardsStr;
@@ -173,22 +227,23 @@ void GameManager::runSession() {
                     }
                 }
 
-                Hand playedHand; 
-                // (Konversi string ke objek Hand kamu di sini, contoh: playedHand.addCard(...))
+                Hand playedHand;
+                for (const auto& cardStr : chosenCardsStr) {
+                    playedHand.cards.push_back(parseCardString(cardStr));
+                }
+                playedHand.sortByRank();
 
                 // ==========================================
                 // Evaluasi Skor & Efek Joker
                 // ==========================================
                 ScoreContext context;
                 
-                /*
-                 * CATATAN UNTUK SCORING RULE:
-                 * Jika 'ScoringRule' kamu belum memiliki fungsi 'getBaseChips' dan 'getMultiplier',
-                 * gunakan fungsi skoring lama milikmu terlebih dahulu sebagai 'baseChips' sementara.
-                 */
+                HandRank rank = scoringRule->evaluateHand(playedHand);
+                context.handType = handRankToString(rank);
                 context.baseChips = scoringRule->scoreHand(playedHand); // Hasil evaluasi awal tangan
                 context.multiplier = 1; // Default multiplier awal
-                context.handType = "Pair"; // TODO: Ganti dengan deteksi tipe tangan sesungguhnya dari ScoringRule
+                
+                std::cout << "    [Hand Type] " << context.handType << "\n";
                 
                 // Memicu Joker agar mengubah 'context' (menambah chip/multiplier)
                 jokerManager.applyAllEffects(context);

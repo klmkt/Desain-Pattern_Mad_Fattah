@@ -42,7 +42,7 @@ struct Hand
     }
 
     bool isFlush() const {
-        if (cards.empty())
+        if (cards.size() < 5)
             return false;
         return suitCounts().size() == 1;
     }

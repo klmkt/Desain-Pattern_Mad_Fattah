@@ -19,11 +19,14 @@ ScoringRule::ScoringRule() {
 
 int ScoringRule::scoreHand(const Hand& hand) {
     std::cout << "Calculating hand score...\n";
-    // Karena rantai sekarang dimulai dari Flush Five, ubah panggilannya ke sini:
     HandRank rank = flushFiveChecker.check(hand); 
     int score = convertRankToScore(rank);
     std::cout << "Final score = " << score << "\n";
     return score;
+}
+
+HandRank ScoringRule::evaluateHand(const Hand& hand) {
+    return flushFiveChecker.check(hand);
 }
 
 int ScoringRule::convertRankToScore(HandRank rank) {

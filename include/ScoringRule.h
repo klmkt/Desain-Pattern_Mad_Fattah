@@ -21,6 +21,7 @@ class ScoringRule
 public:
     ScoringRule();
     int scoreHand(const Hand& hand);
+    HandRank evaluateHand(const Hand& hand);
 
 private:
     RoyalFlushChecker royalFlushChecker;

@@ -2,7 +2,7 @@
 #include "checkers/FlushChecker.h"
 
 HandRank FlushChecker::check(const Hand& hand) {
-    if (hand.isFlush() && !hand.isStraight() && !hand.isFullHouse()) {
+    if (hand.cards.size() == 5 && hand.isFlush() && !hand.isStraight() && !hand.isFullHouse()) {
         std::cout << "Detected FLUSH\n";
         return HandRank::FLUSH;
     }
